@@ -6,6 +6,7 @@ function CreateRoomForm({uuid, socket, setUser}){
     const[roomId, setRoomId] = useState(uuid());
     const[name, setName] = useState("");
     const[error, setError] = useState("");
+    const[copyStatus, setCopyStatus] = useState("");
 
     const navigate = useNavigate();
 
@@ -29,6 +30,14 @@ function CreateRoomForm({uuid, socket, setUser}){
         navigate(`/${roomId}`);
         socket.emit("userJoined", roomData);
     }
+
+    const handleCopyId = () => {
+        console.log("Hii There");
+        navigator.clipboard.writeText(roomId).then(
+            () => setCopyStatus("Copied!"),
+            (err) => setCopyStatus("Failed to copy the text ",err)
+        );
+    };
 
     return(
         <form className="form col-md-12 mt-5">
@@ -55,7 +64,8 @@ function CreateRoomForm({uuid, socket, setUser}){
                     />
                     <div className="input-group-append">
                         <button className="btn btn-primary btn-sm me-2" type="button" onClick={() => {setRoomId(uuid())}}>Generate</button>
-                        <button className="btn btn-outline-danger btn-sm me-1" type="button">Copy</button>
+                        <button className="btn btn-outline-danger btn-sm me-1" type="button" onClick={handleCopyId}>Copy</button>
+                        {/* i could have also wrote the handleCopyId function like this, onClick={() => {handleCopyId()}} */}
                     </div>
                 </div>
             </div>
