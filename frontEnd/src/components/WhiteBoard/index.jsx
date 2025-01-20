@@ -8,7 +8,7 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
     const [isDrawing, setIsDrawing] = useState(false);
     const [lastPoint, setLastPoint] = useState(null);
     
-    // CHANGE: Removed redundant useEffect dependencies
+    
     useEffect(() => {
         const canvas = canvasRef.current;
         const rect = canvas.getBoundingClientRect();
@@ -16,13 +16,13 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
         canvas.height = rect.height;
         const ctx = canvas.getContext('2d');
         ctx.strokeStyle = color;
-        ctx.lineWidth = 2;  // CHANGE: Reduced line width for smoother drawing
+        ctx.lineWidth = 2;  
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctxRef.current = ctx;
     }, []);
 
-    // CHANGE: Added new useEffect for handling real-time drawing updates
+    
     useEffect(() => {
         drawElements();
     }, [elements]);
@@ -42,7 +42,7 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
         // into the correct positions on the canvas, making sure the drawing works properly.
     }
 
-    // CHANGE: Completely revised drawElements function for better rendering
+    
     function drawElements() {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -70,8 +70,8 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
                         element.y2,
                         { 
                             stroke: element.stroke,
-                            roughness: 0.8,  // CHANGE: Reduced roughness for smoother lines
-                            bowing: 0.5      // CHANGE: Reduced bowing for straighter lines
+                            roughness: 0.8,  
+                            bowing: 0.5      
                         }
                     );
                     rough.canvas(canvas).draw(roughLine);
@@ -85,8 +85,8 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
                         element.height,
                         { 
                             stroke: element.stroke,
-                            roughness: 0.8,  // CHANGE: Reduced roughness
-                            bowing: 0.5      // CHANGE: Reduced bowing
+                            roughness: 0.8,  
+                            bowing: 0.5      
                         }
                     );
                     rough.canvas(canvas).draw(roughRect);
@@ -111,7 +111,7 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
         });
     }
 
-    // CHANGE: Simplified mouseDown handler
+    
     function handleMouseDown(e) {
         const coords = getCoordinates(e);
         setIsDrawing(true);
@@ -126,7 +126,7 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
         }
     }
 
-    // CHANGE: Completely revised mouseMove handler for smoother drawing
+    
     function handleMouseMove(e) {
         if (!isDrawing) return;
         const coords = getCoordinates(e);
@@ -143,7 +143,7 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
                 ];
             });
         } else {
-            // For line and rectangle, just update the preview
+            
             drawElements();
             const ctx = canvasRef.current.getContext('2d');
             
@@ -176,11 +176,11 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
                 );
                 rough.canvas(canvasRef.current).draw(roughRect);
             } else if (tool === 'square'){
-                drawElements(); // Clear previous previews
+                drawElements(); 
                 const side = Math.min(
                     Math.abs(coords.x - lastPoint.x),
                     Math.abs(coords.y - lastPoint.y)
-                ); // Use the smaller dimension for side
+                ); 
                 const roughSquare = roughGenerator.rectangle(
                     lastPoint.x,
                     lastPoint.y,
@@ -197,7 +197,7 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
         }
     }
 
-    // CHANGE: Simplified mouseUp handler
+    
     function handleMouseUp(e) {
         if (!isDrawing) return;
         
