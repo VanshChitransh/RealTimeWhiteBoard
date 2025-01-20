@@ -1,0 +1,23 @@
+.error-message {
+    color: #ff4d4d; 
+    font-size: 0.9rem;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 5px;
+    border: 1px solid #ffcccc;
+    background-color: #ffe6e6;
+    border-radius: 5px;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
