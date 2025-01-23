@@ -1,14 +1,23 @@
 import { useState } from "react"
 import './index.css'
+import { useNavigate } from "react-router-dom";
 
-function JoinRoomForm(){
+function JoinRoomForm({setUser}){
     const[name, setName] = useState("");
     const[error, setError] = useState("");
     const[codeError, setCodeError] = useState("");
     const[code, setCode] = useState("");
 
+    const navigate = useNavigate();
+
     function handelFormClick(e){
         e.preventDefault();
+        checkInputs();
+        connectRoute();
+    }
+
+    function checkInputs(){
+
         // console.log("Hello");
         // console.log("This is codeError -> ",codeError);
         // console.log("Hi there");
@@ -34,6 +43,19 @@ function JoinRoomForm(){
         // console.log("This is codeError -> ",codeError);
         setError("");
         setCode("");
+    }
+
+    function connectRoute(){
+        const roomData = {
+            name,
+            host: false,
+            presenter: false
+        }
+        console.log(roomData);
+        setUser(roomData);
+        navigate(`/${code}`);
+        console.log(name + " Joined the room ");
+        // socket.emit("userJoined2", roomData);
     }
     return(
         <form className="form col-md-12 mt-5">

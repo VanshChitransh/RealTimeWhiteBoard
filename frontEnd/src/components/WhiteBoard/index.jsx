@@ -242,8 +242,8 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
         setLastPoint(null);
     }
 
-    console.log(user);
-    console.log("Hi there, this is user", user)
+    // console.log(user);
+    // console.log("Hi there, this is user", user)
     // if (user?.presenter){
     //     return(
     //         <div className='border border-dark border-3 h-100 w-100 overflow-hidden'>

@@ -25,10 +25,11 @@ function CreateRoomForm({uuid, socket, setUser}){
             host: true,
             presenter: true
         }
-        console.log(roomData);
+        // console.log(roomData);
+        console.log(name + " Created the room")
         setUser(roomData);
         navigate(`/${roomId}`);
-        socket.emit("userJoined", roomData);
+        // socket.emit("userJoined", roomData);
     }
 
     const handleCopyId = () => {
