@@ -2,7 +2,7 @@ import { useState } from "react"
 import './index.css'
 import { useNavigate } from "react-router-dom";
 
-function JoinRoomForm({setUser}){
+function JoinRoomForm({setUser,}){
     const[name, setName] = useState("");
     const[error, setError] = useState("");
     const[codeError, setCodeError] = useState("");

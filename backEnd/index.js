@@ -26,12 +26,38 @@ app.get('/', (req, res) => {
 });
 // This is just to check wheater the server is connected or not.
 
+let roomIdGlobal = null;
+let imgURLGlobal = null;
+let elementsGlobal = [];
+
 io.on("connection", (socket) => {
     console.log("User connected");
+
     socket.on("userJoined", (data) => {
-        const {name, userId, roomId, host, presenter} = data;
+        const { roomId } = data;
+        roomIdGlobal = roomId;
         socket.join(roomId);
         socket.emit("userIsJoined", { success: true });
+        
+        // Send existing whiteboard data to newly joined user
+        socket.emit("WhiteBoardDataResponse", {
+            imgURL: imgURLGlobal,
+            elements: elementsGlobal
+        });
+    });
+
+    socket.on("WhiteBoard", (canvasImage) => {
+        imgURLGlobal = canvasImage;
+        socket.broadcast.to(roomIdGlobal).emit("WhiteBoardDataResponse", {
+            imgURL: canvasImage
+        });
+    });
+
+    socket.on("elementUpdate", (data) => {
+        elementsGlobal = data.elements;
+        socket.broadcast.to(roomIdGlobal).emit("elementUpdateResponse", {
+            elements: data.elements
+        });
     });
 });
 // In this code we connect to the socket.io server by using connection and then we have our custom even

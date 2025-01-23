@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import WhiteBoard from '../../components/WhiteBoard';
 
-function RoomPage({ user }) {
+function RoomPage({ user, socket }) {
     const ctxRef = useRef(null);
     const canvasRef = useRef(null);
     const [tool, setTool] = useState("pencil");
@@ -32,7 +32,7 @@ function RoomPage({ user }) {
             <h1 className="text-center py-3">White Board Sharing App</h1>
             <div className="text-center mb-3">[Users Online : 0]</div>
             
-            {/* {user?.presenter && ( */}
+            {user?.presenter && (
                 <div className="row align-items-center justify-content-center">
                     <div className="col-md-3 mb-3 d-flex gap-2">
                         {['pencil', 'line', 'rectangle', 'square'].map((toolType) => (
@@ -67,7 +67,7 @@ function RoomPage({ user }) {
                         <button className="btn btn-danger" onClick={handleClearCanvas}>Clear Canvas</button>
                     </div>
                 </div>
-            {/* )} */}
+            )}
             
             <WhiteBoard 
                 canvasRef={canvasRef}
@@ -77,6 +77,7 @@ function RoomPage({ user }) {
                 color={color}
                 tool={tool}
                 user={user}
+                socket={socket}
             />
         </div>
     );
