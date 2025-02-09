@@ -2,11 +2,12 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom";
 import './index.css';
 
-function CreateRoomForm({uuid, socket, setUser}){
+function CreateRoomForm({uuid, setUser}){
     const[roomId, setRoomId] = useState(uuid());
     const[name, setName] = useState("");
     const[error, setError] = useState("");
     const[copyStatus, setCopyStatus] = useState("");
+    // Check is the copyStatus is being used in this code or not?
 
     const navigate = useNavigate();
 
@@ -17,7 +18,7 @@ function CreateRoomForm({uuid, socket, setUser}){
             // alert("Please enter your name to Generate Room");
             return;
         }
-        setError("");
+        // setError("");
         const roomData = {
             name,
             roomId,
@@ -26,14 +27,31 @@ function CreateRoomForm({uuid, socket, setUser}){
             presenter: true
         }
         // console.log(roomData);
-        console.log(name + " Created the room")
+        console.log(name + " Created the room");
+        // console.log("This is the roomData -> "+roomData);
+        // console.log("This is the roomData -> "+roomData.type);
+        // console.log("This is the roomData -> "+);
+        // console.log("This is the type of roomData -> " + typeof(roomData));
+        // const a = "Vansh";
+        // console.log(typeof(a));
+        // const obj = {name:"vansh", roomNo:"226"};
+        // const strObj = toString(obj);
+        // console.log("This is strObj -> " + strObj);
+        // console.log(obj);
+
+        console.log("This is roomDataName " + roomData.name);
+        console.log("This is roomDataroomId " + roomData.roomId);
+        console.log("This is roomDataUserId " + roomData.userId);
+        console.log("This is roomDataHost " + roomData.host);
+        console.log("This is roomDataPresenter " + roomData.presenter);
+
         setUser(roomData);
         navigate(`/${roomId}`);
         // socket.emit("userJoined", roomData);
     }
 
     const handleCopyId = () => {
-        console.log("Hii There");
+        console.log("Hii There, You copied the meet code");
         navigator.clipboard.writeText(roomId).then(
             () => setCopyStatus("Copied!"),
             (err) => setCopyStatus("Failed to copy the text ",err)

@@ -3,46 +3,9 @@ import rough from 'roughjs';
 
 const roughGenerator = rough.generator();
 
-function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, user, socket }) {
-
+function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, user, socket, roomId }) {
     const [isDrawing, setIsDrawing] = useState(false);
     const [lastPoint, setLastPoint] = useState(null);
-    const [img, setImg] = useState(null);
-    const [receivedElements, setReceivedElements] = useState([]);
-
-    useEffect(() => {
-        console.log("I am here")
-        socket.on("WhiteBoardDataResponse", (data) => {
-            setImg(data.imgURL);
-        })
-    },[])
-    
-    useEffect(() => {
-        console.log("I am here 1")
-        socket.on("elementUpdateResponse", (data) => {
-            setReceivedElements(data.elements);
-        });
-    }, [socket]);
-
-    useEffect(() => {
-        console.log("I am here 2")
-        if (user?.presenter) {
-            socket.emit("elementUpdate", { elements });
-        }
-    }, [elements, user]);
-    
-    if(!user?.presenter){
-        return(
-            <div className='border border-dark border-3 h-100 w-100 overflow-hidden'>
-                <canvas 
-                    ref={canvasRef} 
-                    className="w-100 h-100"
-                    style={{ minHeight: '500px' }}
-                />
-                {img && <img src={img} alt='Real-time whiteBoard will be sharing here' className='h-100 w-100'/>}
-            </div>
-        )
-    }
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -57,11 +20,37 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
         ctxRef.current = ctx;
     }, []);
 
-    
     useEffect(() => {
+        console.log("Socket in WhiteBoard:", socket);
+        console.log("Room ID:", roomId);
+        
+        if (roomId) {
+            socket.emit("userJoined", {
+                roomId,
+                userId: socket.id,
+                name: user?.name || "Anonymous",
+                host: user?.host || false,
+                presenter: user?.presenter || false
+            });
+        }
+    }, [socket, roomId, user]);
+
+    useEffect(() => {
+        socket.on("whiteBoardDataResponse", (data) => {
+            if (data.elements) {
+                setElements(data.elements);
+            }
+        });
+    }, [socket, setElements]);
+
+    useEffect(() => {
+        if (user?.presenter) {
+            socket.emit("elementUpdate", { 
+                roomId, 
+                elements 
+            });
+        }
         drawElements();
-        const canvasImage = canvasRef.current.toDataURL()
-        socket.emit("WhiteBoard", canvasImage);
     }, [elements]);
 
     function getCoordinates(e) {
@@ -75,16 +64,13 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
         };
     }
 
-    
     function drawElements() {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        const allElements = [...elements, ...receivedElements];
-
-        allElements.forEach(element => {
+        elements.forEach(element => {
             ctx.strokeStyle = element.stroke;
             
             switch (element.type) {
@@ -99,30 +85,16 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
 
                 case 'line':
                     const roughLine = roughGenerator.line(
-                        element.x1,
-                        element.y1,
-                        element.x2,
-                        element.y2,
-                        { 
-                            stroke: element.stroke,
-                            roughness: 0.8,  
-                            bowing: 0.5      
-                        }
+                        element.x1, element.y1, element.x2, element.y2,
+                        { stroke: element.stroke, roughness: 0.8, bowing: 0.5 }
                     );
                     rough.canvas(canvas).draw(roughLine);
                     break;
 
                 case 'rectangle':
                     const roughRect = roughGenerator.rectangle(
-                        element.x1,
-                        element.y1,
-                        element.width,
-                        element.height,
-                        { 
-                            stroke: element.stroke,
-                            roughness: 0.8,  
-                            bowing: 0.5      
-                        }
+                        element.x1, element.y1, element.width, element.height,
+                        { stroke: element.stroke, roughness: 0.8, bowing: 0.5 }
                     );
                     rough.canvas(canvas).draw(roughRect);
                     break;
@@ -130,15 +102,8 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
                 case 'square':
                     const side = Math.min(element.width, element.height);
                     const roughSqr = roughGenerator.rectangle(
-                        element.x1,
-                        element.y1,
-                        side,
-                        side,
-                        {
-                            stroke: element.stroke,
-                            roughness: 0.8,
-                            bowing: 0.5
-                        }
+                        element.x1, element.y1, side, side,
+                        { stroke: element.stroke, roughness: 0.8, bowing: 0.5 }
                     );
                     rough.canvas(canvas).draw(roughSqr);
                     break;
@@ -146,7 +111,6 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
         });
     }
 
-    
     function handleMouseDown(e) {
         const coords = getCoordinates(e);
         setIsDrawing(true);
@@ -161,7 +125,6 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
         }
     }
 
-    
     function handleMouseMove(e) {
         if (!isDrawing) return;
         const coords = getCoordinates(e);
@@ -178,61 +141,36 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
                 ];
             });
         } else {
-            
             drawElements();
-            const ctx = canvasRef.current.getContext('2d');
             
             if (tool === 'line') {
                 const roughLine = roughGenerator.line(
-                    lastPoint.x,
-                    lastPoint.y,
-                    coords.x,
-                    coords.y,
-                    { 
-                        stroke: color,
-                        roughness: 0.8,
-                        bowing: 0.5
-                    }
+                    lastPoint.x, lastPoint.y, coords.x, coords.y,
+                    { stroke: color, roughness: 0.8, bowing: 0.5 }
                 );
                 rough.canvas(canvasRef.current).draw(roughLine);
             } else if (tool === 'rectangle') {
                 const width = coords.x - lastPoint.x;
                 const height = coords.y - lastPoint.y;
                 const roughRect = roughGenerator.rectangle(
-                    lastPoint.x,
-                    lastPoint.y,
-                    width,
-                    height,
-                    { 
-                        stroke: color,
-                        roughness: 0.8,
-                        bowing: 0.5
-                    }
+                    lastPoint.x, lastPoint.y, width, height,
+                    { stroke: color, roughness: 0.8, bowing: 0.5 }
                 );
                 rough.canvas(canvasRef.current).draw(roughRect);
             } else if (tool === 'square'){
-                drawElements(); 
                 const side = Math.min(
                     Math.abs(coords.x - lastPoint.x),
                     Math.abs(coords.y - lastPoint.y)
                 ); 
                 const roughSquare = roughGenerator.rectangle(
-                    lastPoint.x,
-                    lastPoint.y,
-                    side,
-                    side,
-                    {
-                        stroke: color,
-                        roughness: 0.8,
-                        bowing: 0.5
-                    }
+                    lastPoint.x, lastPoint.y, side, side,
+                    { stroke: color, roughness: 0.8, bowing: 0.5 }
                 );
                 rough.canvas(canvasRef.current).draw(roughSquare);
             }
         }
     }
 
-    
     function handleMouseUp(e) {
         if (!isDrawing) return;
         
@@ -277,21 +215,31 @@ function WhiteBoard({ canvasRef, ctxRef, elements, setElements, color, tool, use
         setLastPoint(null);
     }
     
+    if (!user?.presenter) {
+        return (
+            <div className='border border-dark border-3 h-100 w-100 overflow-hidden'>
+                <canvas 
+                    ref={canvasRef} 
+                    className="w-100 h-100"
+                    style={{ minHeight: '500px' }}
+                />
+            </div>
+        );
+    }
+
     return (
-        <div>
-            <canvas
-                ref={canvasRef}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-                className="border border-dark w-100 h-100"
-                style={{ 
-                    minHeight: '500px',
-                    cursor: 'crosshair'
-                }}
-            />
-        </div>
+        <canvas
+            ref={canvasRef}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            className="border border-dark w-100 h-100"
+            style={{ 
+                minHeight: '500px',
+                cursor: 'crosshair'
+            }}
+        />
     );
 }
 

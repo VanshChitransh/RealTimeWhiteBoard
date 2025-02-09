@@ -1,7 +1,9 @@
 import React, { useState, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 import WhiteBoard from '../../components/WhiteBoard';
 
-function RoomPage({ user, socket }) {
+function RoomPage({ user, socket, users }) {
+    const { roomId } = useParams();
     const ctxRef = useRef(null);
     const canvasRef = useRef(null);
     const [tool, setTool] = useState("pencil");
@@ -30,7 +32,7 @@ function RoomPage({ user, socket }) {
     return (
         <div className="container">
             <h1 className="text-center py-3">White Board Sharing App</h1>
-            <div className="text-center mb-3">[Users Online : 0]</div>
+            <div className="text-center mb-3">[Users Online : {users.length}]</div>
             
             {user?.presenter && (
                 <div className="row align-items-center justify-content-center">
@@ -51,8 +53,6 @@ function RoomPage({ user, socket }) {
                         ))}
                     </div>
                     <div className="col-md-3 mb-3 d-flex align-items-center gap-4">
-                        <br/>
-                        <br/>
                         <label>Select Color: </label>
                         <input
                             type="color"
@@ -78,6 +78,7 @@ function RoomPage({ user, socket }) {
                 tool={tool}
                 user={user}
                 socket={socket}
+                roomId={roomId}
             />
         </div>
     );

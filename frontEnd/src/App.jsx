@@ -17,18 +17,27 @@ const socket = io(server, connectionOptions);
 
 function App() {
   const [user, setUser] = useState(null);
+  const [users, setUsers] = useState([]);
+
+// useEffect(() => {
+//   console.log("Socket connected:", socket.connected);
+//   socket.on("connect", () => {
+//     console.log("Socket connection established");
+//   });
+// }, []);
 
   useEffect(() => {
-    // Changed Socket.on to socket.on (lowercase)
+
     socket.on("userIsJoined", (data) => {
       if (data.success) {
         console.log("UserJoined");
+        setUsers(data.users);
       } else {
         console.log("userJoined error");
       }
     });
 
-    // Add cleanup function to remove event listener
+
     return () => {
       socket.off("userIsJoined");
     };
@@ -63,7 +72,7 @@ function App() {
         />
         <Route 
           path="/:roomId" 
-          element={<RoomPage user={user} socket={socket}/>}
+          element={<RoomPage user={user} socket={socket} users={users}/>}
         />
       </Routes>
     </div>
