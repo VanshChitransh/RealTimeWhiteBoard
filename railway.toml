@@ -1,13 +1,7 @@
-[build.backend]
-base = "backEnd"
-cmd = "npm install && npm run build"
+[build]
+builder = "nixpacks"
+buildCommand = "npm install && npm run build"
+startCommand = "npm start"
 
-[build.frontend]
-base = "frontEnd"
-cmd = "npm install && npm run build"
-
-[start.backend]
-cmd = "npm start"
-
-[start.frontend]
-cmd = "npm run preview"  # If using Vite
+[env]
+PORT = "8080"
