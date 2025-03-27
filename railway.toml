@@ -1,0 +1,13 @@
+[build.backend]
+base = "backEnd"
+cmd = "npm install && npm run build"
+
+[build.frontend]
+base = "frontEnd"
+cmd = "npm install && npm run build"
+
+[start.backend]
+cmd = "npm start"
+
+[start.frontend]
+cmd = "npm run preview"  # If using Vite
