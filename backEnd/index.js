@@ -1,5 +1,6 @@
 const express = require("express");
 // // Here we imported the express module
+const path = require("path");
 const app = express();
 // // Here we create the instance of the express application and this also create an HTTP server
 const cors = require('cors');
@@ -14,7 +15,7 @@ app.use(cors());
 // // It is a middleWare which is a security feature implemented by browsers that blocks website from making requests to a different origin/domain/port.
 // // by doing app.use(cors()) we are telling express to use cors as a middleWare.
 
-const io = new Server(server, {cors:{origin: "http://localhost:5173", methods: ["GET","POST"]}});
+const io = new Server(server, {cors:{origin: "*", methods: ["GET","POST"]}});
 // // Here we have create a socket.io server with CORS middleWare, the basic syntax is like this const io = new Server(server) but we had it like this const io = new Server(server,{})
 
 const rooms = {};
@@ -115,6 +116,15 @@ io.on("connection", (socket) => {
         }
     });
 });
+
+// Add this after your existing routes
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../frontEnd/dist')));
+    
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(__dirname, '../frontEnd/dist/index.html'));
+    });
+}
 
 const port = process.env.PORT || 3000;
 server.listen(port, () => {

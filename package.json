@@ -1,0 +1,21 @@
+{
+  "name": "realtimewhiteboard",
+  "version": "1.0.0",
+  "description": "",
+  "main": "rough.js",
+  "scripts": {
+    "build": "cd frontEnd && npm install && npm run build && cd ../backEnd && npm install",
+    "start": "cd backEnd && node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VanshChitransh/RealTimeWhiteBoard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VanshChitransh/RealTimeWhiteBoard/issues"
+  },
+  "homepage": "https://github.com/VanshChitransh/RealTimeWhiteBoard#readme"
+}
